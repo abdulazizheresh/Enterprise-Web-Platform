@@ -1,0 +1,314 @@
+1- ACR:
+
+Name: EnterpriseWebApp
+RG: rg-enterprise-centralca
+
+Username: EnterpriseWebApp
+Password: [ACR_PASSWORD]
+
+----------------------------------------------------------------------------------
+
+Login into ACR by PS:
+docker login enterprisewebapp.azurecr.io -u EnterpriseWebApp -p [ACR_PASSWORD]
+
+----------------------------------------------------------------------------------
+
+Tagging and Push a Backend Dockerfile:
+
+In VSCode:
+docker build -t enterprise-backend:1 .
+
+To Push into Azure:
+docker tag enterprise-backend:1 enterprisewebapp.azurecr.io/enterprise-backend:1
+docker push enterprisewebapp.azurecr.io/enterprise-backend:1
+
+----------------------------------------------------------------------------------
+
+Tagging and Push a Frontend Dockerfile
+
+In VSCode:
+docker build --build-arg VITE_API_URL="/api" --build-arg VITE_SOCKET_URL="/" -t enterprise-frontend:1 .
+
+
+To Push into Azure:
+docker tag enterprise-frontend:1 enterprisewebapp.azurecr.io/enterprise-frontend:1
+docker push enterprisewebapp.azurecr.io/enterprise-frontend:1
+
+----------------------------------------------------------------------------------
+
+2- VNet: 
+
+Name: EnterpriseVNET
+RG: rg-enterprise-centralca
+
+Address Space: 10.0.0.0/16
+management: 10.0.0.0/24,
+web: 10.0.1.0/24،
+app: 10.0.2.0/24،
+db: 10.0.3.0/24،
+PE: 10.0.5.0/24,
+appgw: 10.0.10.0/24.
+
+----------------------------------------------------------------------------------
+
+3- Azure Database for MySQL Flexible Server
+
+Server Name: enterprise-mysql-server
+RG: rg-enterprise-centralca
+
+username: dbadmin
+password: [MySQL_FS_Password]
+Network: Private Network
+
+Type: Burstable (B1ms)
+
+Connected With Subnet: db
+
+----------------------------------------------------------------------------------
+
+4- Virtual Machine For Management (MySQL Server):
+
+Name: EnterpriseManageVM
+RG: rg-enterprise-vm
+
+Size: Standard B2as v2 (2 vcpus, 8 GiB memory)
+
+Disks: OsDisk - Standard SSD LRS - 127GiB - SSE with PMK
+
+Operating System: Windows Server 2025 Datacenter Azure Edition.
+
+Public IP: Enabled
+
+Private IP: 10.0.0.4 - Associate with management Subnet.
+
+Allowed Inbound Port: 3389 - RDP
+
+
+Credentials:
+Username: admin-manage
+Pass: 888888Az
+
+----------------------------------------------------------------------------------
+
+5- Redis (Azure Cache for Redis)
+
+Name: EnterpriseCachesRedis
+RG: rg-enterprise-centralca
+
+Tier: Basic C0
+
+Network: Private Endpoint -> PE-EnterpriseCachesRedis ---- Subnet -> 10.0.5.1/24
+
+NIC: PE-EnterpriseCachesRedis.nic.698d3795-d750-4dec-ab01-fee8a7a4366f
+
+
+REDIS_URL=rediss://:<PRIMARY_KEY>@<HOST>:6380
+
+| |
+v v 
+
+rediss://:R1w4aODc2ojiD6Dc..........=@enterprisecachesredis.redis.cache.windows.net:6380
+
+----------------------------------------------------------------------------------
+
+6- NSGs:
+
+Name: nsg-web (Subnet: web 10.0.1.0/24)
+RG: rg-enterprise-centralca
+
+Inbound:
+
+Allow-HTTP-from-AppGW: Priority 100, Source 10.0.10.0/24, Port 80, TCP, Allow.
+
+Allow-HTTPS-from-AppGW: Priority 110, Source 10.0.10.0/24, Port 443, TCP, Allow.
+
+Associate: Subnets → Associate → VNet: EnterpriseVNET → Subnet: web.
+
+---------------------------------------------------------------
+
+Name: nsg-app (Subnet: app 10.0.2.0/24)
+RG: rg-enterprise-centralca
+
+Inbound:
+
+Allow-Backend-from-AppGW: Priority 100, Source 10.0.10.0/24, Port 5000, TCP, Allow.
+
+Outbound:
+
+Allow-MySQL-to-db: Priority 100, Dest 10.0.3.0/24, Port 3306, TCP, Allow.
+
+Allow-Redis-to-PE: Priority 110, Dest 10.0.5.0/24, Port 6380, TCP, Allow.
+
+Associate: Subnets → Associate → VNet: EnterpriseVNET → Subnet: app.
+
+---------------------------------------------------------------
+
+Name: nsg-db (Subnet: db 10.0.3.0/24)
+RG: rg-enterprise-centralca
+
+Inbound:
+
+Allow-MySQL-from-app: Priority 100, Source 10.0.2.0/24, Port 3306, TCP, Allow.
+
+Associate: Subnets → Associate → VNet: EnterpriseVNET → Subnet: db
+
+----------------------------------------------------------------------------------
+
+7- Backend ACI
+
+Name: enterprise-backend
+RG: rg-enterprise-centralca
+
+Connected With Subnet: app
+
+---
+
+If you want update a ACI with New ACR Image:
+
+Firstly: Delete a Previous ACI -> az container delete --name [ACI_Name] --resource-group [RG_Name] --yes
+
+
+Secondly: Create and Publish this ACI Using Azure CLI:
+
+az container create --resource-group rg-enterprise-centralca --name enterprise-backend --image enterprisewebapp.azurecr.io/enterprise-backend:10 --registry-login-server enterprisewebapp.azurecr.io --registry-username EnterpriseWebApp --registry-password "$(az keyvault secret show --name acr-password --vault-name enterprise-app-keyvault --query value -o tsv)" --vnet EnterpriseVNET --subnet app --ports 5000 --protocol TCP --assign-identity --cpu 1 --memory 1 --os-type Linux --secure-environment-variables JWT_SECRET="$(az keyvault secret show --name jwt-secret --vault-name enterprise-app-keyvault --query value -o tsv)" DB_HOST="$(az keyvault secret show --name db-host --vault-name enterprise-app-keyvault --query value -o tsv)" DB_USER="$(az keyvault secret show --name db-user --vault-name enterprise-app-keyvault --query value -o tsv)" DB_PASSWORD="$(az keyvault secret show --name db-password --vault-name enterprise-app-keyvault --query value -o tsv)" DB_NAME="$(az keyvault secret show --name db-name --vault-name enterprise-app-keyvault --query value -o tsv)" DB_PORT="$(az keyvault secret show --name db-port --vault-name enterprise-app-keyvault --query value -o tsv)" REDIS_URL="$(az keyvault secret show --name redis-url --vault-name enterprise-app-keyvault --query value -o tsv)" FRONTEND_URL="$(az keyvault secret show --name frontend-url --vault-name enterprise-app-keyvault --query value -o tsv)"
+
+----------------------------------------------------------------------------------
+
+8- Frontend ACI
+
+Name: enterprise-frontend
+RG: rg-enterprise-centralca
+
+Connected With Subnet: web
+
+---
+
+If you want update a ACI with New ACR Image:
+
+
+Firstly: Delete a Previous ACI -> az container delete --name [ACI_Name] --resource-group [RG_Name] --yes
+
+Secondly: Create and Publish this ACI Using Azure CLI:
+
+az container create --resource-group rg-enterprise-centralca --name enterprise-frontend --image enterprisewebapp.azurecr.io/enterprise-frontend:5 --registry-login-server enterprisewebapp.azurecr.io --registry-username EnterpriseWebApp --registry-password "$(az keyvault secret show --name acr-password --vault-name enterprise-app-keyvault --query value -o tsv)" --vnet EnterpriseVNET --subnet web --ip-address Private --ports 80 --protocol TCP --assign-identity --cpu 1 --memory 1 --os-type Linux --secure-environment-variables VITE_API_URL="http://4.248.248.213/api" VITE_SOCKET_URL="http://4.248.248.213"
+
+----------------------------------------------------------------------------------
+
+9- Application Gateway
+
+Name: enterprise-app-gateway
+RG: rg-enterprise-centralca
+
+Tier: Basic
+
+---------------------------------------------------------------
+
+Frontend Public IP: pip-app-gateway
+
+---------------------------------------------------------------
+
+Backend Pools:
+
+1- pool-backend - Target: IP address or FQD (Paste Private IP from Backend of ACI)
+
+2- pool-backend - Target: IP address or FQD (Paste Private IP from Frontend of ACI)
+
+---------------------------------------------------------------
+
+Routing Rule:
+
+Listener:
+
+Name: rule-http
+
+Listener Name: lis-http-80
+
+Protocol: HTTP
+
+Port 80
+
+Listener Type: Basic
+
+---------------------------------------------------------------
+
+Backend Targets:
+
+Target type: Backend pool
+
+Backend target: pool-frontend
+Backend settings: bhs-frontend-80
+
+Path based rules:
+/api/*
+/socket.io/*
+
+
+Connected With Subnet: appgw
+
+-----------------------------------------------------------------------------
+
+10- Key Vault:
+
+Name: enterprise-app-keyvault
+RG: rg-enterprise-centralca
+
+Pricing tier: Standard
+
+Permission model: Azure role-based access control (RBAC)
+
+
+Data:
+Secret 1: JWT Secret
+Name: jwt-secret
+Secret value: [JWT_Secret_Key]
+Content type: API Key
+
+Secret 2: Database Host
+Name: db-host
+Secret value: [Database_Host]
+Content type: Database Connection
+
+Secret 3: Frontend URL
+Name: frontend-url
+Secret value: [URL]
+Content type: URL
+
+Secret 4: Database Name
+Name: db-name
+Secret value: [Database_Name]
+Content type: Database Name
+
+Secret 5: Database User
+Name: db-user
+Secret value: [MySQL_Username]
+Content type: Username
+
+Secret 6: Database Password
+Name: db-password
+Secret value: [MySQL_Password]
+Content type: Password
+
+Secret 7: Database Port
+Name: db-port
+Secret value: 3306
+Content type: Port
+
+Secret 8: Redis URL
+Name: redis-url
+Secret value: [Redis_URL]
+Content type: Connection String
+
+Secret 9: ACR Password
+Name: acr-password
+Secret value: [ACR-Password]
+Content type: ACR Password
+
+-----------------------------------------------------------------------------
+
+11- Private DNS Zone:
+
+RG: rg-enterprise-centralca
+
+enterprise-mysql-server.private.mysql.database.azure.com
+
+privatelink.redis.cache.windows.net

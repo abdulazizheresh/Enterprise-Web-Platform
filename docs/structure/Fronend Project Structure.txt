@@ -1,0 +1,85 @@
+vue-frontend/
+├── public/
+│   ├── index.html
+│   ├── manifest.json          # PWA manifest
+│   └── icons/                 # PWA icons
+│
+├── src/
+│   ├── main.js               # App entry point
+│   ├── App.vue               # Root component
+│   │
+│   ├── views/                # Page components
+│   │   ├── HomeView.vue
+│   │   ├── auth/
+│   │   │   ├── LoginView.vue
+│   │   │   ├── RegisterView.vue
+│   │   │   └── MFASetup.vue
+│   │   ├── DashboardView.vue
+│   │   ├── ProfileView.vue
+│   │   ├── NotificationsView.vue
+│   │   └── HealthMonitor.vue
+│   │
+│   ├── components/           # Reusable components
+│   │   ├── layout/
+│   │   │   ├── AppHeaderView.vue
+│   │   │   ├── AppSidebarView.vue
+│   │   │   └── AppFooterView.vue
+│   │   ├── ui/
+│   │   │   ├── ButtonView.vue
+│   │   │   ├── CardView.vue
+│   │   │   ├── ModalView.vue
+│   │   │   └── LoadingView.vue
+│   │   ├── charts/
+│   │   │   ├── LineChartView.vue
+│   │   │   ├── BarChartView.vue
+│   │   │   └── PieChartView.vue
+│   │   └── forms/
+│   │       ├── LoginForm.vue
+│   │       ├── RegisterForm.vue
+│   │       └── ProfileForm.vue
+│   │
+│   ├── stores/               # Pinia stores
+│   │   ├── auth.js           # Authentication state
+│   │   ├── user.js           # User profile state
+│   │   ├── dashboard.js      # Dashboard data
+│   │   ├── notifications.js  # Notifications state
+│   │   └── socket.js         # Socket.IO state
+│   │
+│   ├── services/             # API services
+│   │   ├── api.js            # Axios instance & interceptors
+│   │   ├── auth.service.js   # Auth API calls
+│   │   ├── user.service.js   # User API calls
+│   │   ├── dashboard.service.js
+│   │   └── socket.service.js # Socket.IO client
+│   │
+│   ├── composables/          # Vue composables
+│   │   ├── useAuth.js        # Auth logic
+│   │   ├── useSocket.js      # Socket.IO handling
+│   │   ├── useNotifications.js
+│   │   └── useTheme.js       # Dark/Light mode
+│   │
+│   ├── router/
+│   │   └── index.js          # Vue Router config
+│   │
+│   ├── utils/                # Helper functions
+│   │   ├── constants.js      # App constants
+│   │   ├── helpers.js        # Utility functions
+│   │   ├── validators.js     # Form validation
+│   │   └── storage.js        # Local storage helpers
+│   │
+│   ├── assets/               # Static assets
+│   │   ├── css/
+│   │   │   └── main.css      # Global styles
+│   │   ├── images/
+│   │   └── icons/
+│   │
+│   └── plugins/              # Vue plugins
+│       ├── pinia.js
+│       └── socket.js
+│
+├── package.json
+├── vite.config.js
+├── tailwind.config.js
+├── .env
+├── .env.example
+└── README.md

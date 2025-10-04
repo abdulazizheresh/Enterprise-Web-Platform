@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <!-- Primary Meta Tags -->
+        <title>Enterprise Platform - Cloud Native Web Application</title>
+        <meta name="title"
+            content="Enterprise Platform - Cloud Native Web Application">
+        <meta name="description"
+            content="Modern enterprise platform built with Vue.js and Node.js, featuring real-time monitoring, advanced security, and scalable Azure infrastructure.">
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="https://enterprise-platform.com/">
+        <meta property="og:title"
+            content="Enterprise Platform - Cloud Native Web Application">
+        <meta property="og:description"
+            content="Modern enterprise platform built with Vue.js and Node.js, featuring real-time monitoring, advanced security, and scalable Azure infrastructure.">
+        <meta property="og:image" content="/og-image.png">
+
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image">
+        <meta property="twitter:url" content="https://enterprise-platform.com/">
+        <meta property="twitter:title"
+            content="Enterprise Platform - Cloud Native Web Application">
+        <meta property="twitter:description"
+            content="Modern enterprise platform built with Vue.js and Node.js, featuring real-time monitoring, advanced security, and scalable Azure infrastructure.">
+        <meta property="twitter:image" content="/twitter-image.png">
+
+        <!-- PWA -->
+        <link rel="manifest" href="/manifest.json">
+        <meta name="theme-color" content="#1f2937">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="default">
+        <meta name="apple-mobile-web-app-title" content="Enterprise Platform">
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+        <!-- Icons -->
+        <link rel="icon" type="image/png" sizes="32x32"
+            href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16"
+            href="/favicon-16x16.png">
+
+        <!-- Preconnect to external domains -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+        <!-- Security Headers -->
+        <meta http-equiv="X-Content-Type-Options" content="nosniff">
+        <meta http-equiv="X-Frame-Options" content="DENY">
+        <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+        <meta http-equiv="Referrer-Policy"
+            content="strict-origin-when-cross-origin">
+
+        <!-- Loading styles -->
+        <style>
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.3s ease-out;
+    }
+    
+    .loading-logo {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 24px;
+      animation: pulse 2s infinite;
+    }
+    
+    .loading-text {
+      color: white;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+  </style>
+    </head>
+    <body>
+        <!-- Loading Screen -->
+        <div id="loading-screen">
+            <svg class="loading-logo" viewBox="0 0 100 100" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="45" stroke="white" stroke-width="8"
+                    fill="none" opacity="0.3" />
+                <circle cx="50" cy="50" r="30" fill="white" />
+                <path d="M40 45 L48 53 L60 41" stroke="#667eea" stroke-width="3"
+                    stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <div class="loading-text">Enterprise Platform</div>
+            <div class="loading-spinner"></div>
+        </div>
+
+        <!-- App Root -->
+        <div id="app"></div>
+
+        <!-- Remove loading screen -->
+        <script>
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+          loadingScreen.classList.add('fade-out');
+          setTimeout(() => {
+            loadingScreen.remove();
+          }, 300);
+        }
+      }, 1000);
+    });
+  </script>
+
+        <!-- Vite Script -->
+        <script type="module" src="/src/main.js"></script>
+    </body>
+</html>

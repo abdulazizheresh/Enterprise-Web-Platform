@@ -1,0 +1,41 @@
+enterprise-backend/
+├── server.js                 # Entry point
+├── package.json
+├── .env                      # Environment variables
+├── .gitignore
+├── README.md
+├── logs/                     # Log files
+│   ├── error.log
+│   └── combined.log
+├── src/
+│   ├── config/
+│   │   ├── database.js       # Database connection
+│   │   └── redis.js          # Redis connection
+│   ├── models/
+│   │   ├── User.js           # User model
+│   │   └── index.js          # Models export
+│   ├── routes/
+│   │   ├── auth.js           # Authentication routes
+│   │   ├── user.js           # User routes
+│   │   ├── dashboard.js      # Dashboard routes
+│   │   └── notifications.js  # Notification routes
+│   ├── middleware/
+│   │   ├── auth.js           # JWT verification
+│   │   ├── validation.js     # Input validation
+│   │   └── rateLimiter.js    # Rate limiting
+│   ├── controllers/
+│   │   ├── authController.js # Auth logic
+│   │   ├── userController.js # User logic
+│   │   └── dashboardController.js
+│   ├── services/
+│   │   ├── emailService.js   # Email sending
+│   │   ├── mfaService.js     # MFA logic
+│   │   └── socketService.js  # Socket.IO logic
+│   └── utils/
+│       ├── logger.js         # Winston logger
+│       └── helpers.js        # Helper functions
+├── tests/
+│   ├── auth.test.js          # Auth tests
+│   └── user.test.js          # User tests
+└── docs/
+    └── api.md                # API documentation

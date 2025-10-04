@@ -1,0 +1,33 @@
+# deps
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# builds & coverage
+dist/
+build/
+coverage/
+.tmp/
+.tmp*/ 
+
+# env & أسرار
+.env
+.env.*
+*.pem
+*.key
+*.crt
+
+# VCS/IDE/OS
+.git/
+.gitignore
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# اختبارات وأدوات
+tests/
+__tests__/
+.cypress/
+.playwright/

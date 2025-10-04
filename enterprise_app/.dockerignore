@@ -1,0 +1,26 @@
+node_modules/
+dist/
+build/
+coverage/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+.env
+.env.*
+*.pem
+*.key
+*.crt
+
+.git/
+.gitignore
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# أدوات E2E (إن وُجدت)
+cypress/
+cypress/videos/
+cypress/screenshots/
+playwright-report/
