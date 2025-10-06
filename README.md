@@ -36,7 +36,7 @@ A comprehensive full-stack application demonstrating enterprise-level cloud arch
 
 The application follows a **multi-tier architecture** with complete network isolation and defense-in-depth security principles.
 
-![Architecture Diagram](./docs/diagrams/enterprise-web-app%20-%201.webp)
+![Architecture Diagram](./docs/diagrams/enterprise-web-app%20-%201.png)
 
 ### Architecture Components
 
