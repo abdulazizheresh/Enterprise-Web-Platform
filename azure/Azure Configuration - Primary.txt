@@ -42,8 +42,8 @@ Name: EnterpriseVNET
 RG: rg-enterprise-centralca
 
 Address Space: 10.0.0.0/16
+
 management: 10.0.0.0/24,
-web: 10.0.1.0/24،
 app: 10.0.2.0/24،
 db: 10.0.3.0/24،
 PE: 10.0.5.0/24,
@@ -60,7 +60,7 @@ username: dbadmin
 password: [MySQL_FS_Password]
 Network: Private Network
 
-Type: Burstable (B1ms)
+Type: Burstable (Standard_B1ms)
 
 Connected With Subnet: db
 
@@ -82,6 +82,8 @@ Public IP: Enabled
 Private IP: 10.0.0.4 - Associate with management Subnet.
 
 Allowed Inbound Port: 3389 - RDP
+
+Connected With Subnet: management
 
 
 Credentials:
@@ -154,43 +156,24 @@ Associate: Subnets → Associate → VNet: EnterpriseVNET → Subnet: db
 
 ----------------------------------------------------------------------------------
 
-7- Backend ACI
+7- App Service (Web Service) - Backend
 
 Name: enterprise-backend
 RG: rg-enterprise-centralca
 
 Connected With Subnet: app
 
----
-
-If you want update a ACI with New ACR Image:
-
-Firstly: Delete a Previous ACI -> az container delete --name [ACI_Name] --resource-group [RG_Name] --yes
-
-
-Secondly: Create and Publish this ACI Using Azure CLI:
-
-az container create --resource-group rg-enterprise-centralca --name enterprise-backend --image enterprisewebapp.azurecr.io/enterprise-backend:10 --registry-login-server enterprisewebapp.azurecr.io --registry-username EnterpriseWebApp --registry-password "$(az keyvault secret show --name acr-password --vault-name enterprise-app-keyvault --query value -o tsv)" --vnet EnterpriseVNET --subnet app --ports 5000 --protocol TCP --assign-identity --cpu 1 --memory 1 --os-type Linux --secure-environment-variables JWT_SECRET="$(az keyvault secret show --name jwt-secret --vault-name enterprise-app-keyvault --query value -o tsv)" DB_HOST="$(az keyvault secret show --name db-host --vault-name enterprise-app-keyvault --query value -o tsv)" DB_USER="$(az keyvault secret show --name db-user --vault-name enterprise-app-keyvault --query value -o tsv)" DB_PASSWORD="$(az keyvault secret show --name db-password --vault-name enterprise-app-keyvault --query value -o tsv)" DB_NAME="$(az keyvault secret show --name db-name --vault-name enterprise-app-keyvault --query value -o tsv)" DB_PORT="$(az keyvault secret show --name db-port --vault-name enterprise-app-keyvault --query value -o tsv)" REDIS_URL="$(az keyvault secret show --name redis-url --vault-name enterprise-app-keyvault --query value -o tsv)" FRONTEND_URL="$(az keyvault secret show --name frontend-url --vault-name enterprise-app-keyvault --query value -o tsv)"
+To assign a Role into Azure Key Vault:
+az role assignment create --role "Key Vault Secrets User" --assignee-object-id [Object-Id] --scope /subscriptions/[Subscription_Id]/resourceGroups/[RG_Name]/providers/Microsoft.KeyVault/vaults/[Key_Vault_Name]
 
 ----------------------------------------------------------------------------------
 
-8- Frontend ACI
+8- App Service (Web Service) - Frontend
 
 Name: enterprise-frontend
 RG: rg-enterprise-centralca
 
-Connected With Subnet: web
-
----
-
-If you want update a ACI with New ACR Image:
-
-
-Firstly: Delete a Previous ACI -> az container delete --name [ACI_Name] --resource-group [RG_Name] --yes
-
-Secondly: Create and Publish this ACI Using Azure CLI:
-
-az container create --resource-group rg-enterprise-centralca --name enterprise-frontend --image enterprisewebapp.azurecr.io/enterprise-frontend:5 --registry-login-server enterprisewebapp.azurecr.io --registry-username EnterpriseWebApp --registry-password "$(az keyvault secret show --name acr-password --vault-name enterprise-app-keyvault --query value -o tsv)" --vnet EnterpriseVNET --subnet web --ip-address Private --ports 80 --protocol TCP --assign-identity --cpu 1 --memory 1 --os-type Linux --secure-environment-variables VITE_API_URL="http://4.248.248.213/api" VITE_SOCKET_URL="http://4.248.248.213"
+Connected With Subnet: app
 
 ----------------------------------------------------------------------------------
 
@@ -199,7 +182,7 @@ az container create --resource-group rg-enterprise-centralca --name enterprise-f
 Name: enterprise-app-gateway
 RG: rg-enterprise-centralca
 
-Tier: Basic
+Tier: Standard_V2
 
 ---------------------------------------------------------------
 
@@ -209,9 +192,9 @@ Frontend Public IP: pip-app-gateway
 
 Backend Pools:
 
-1- pool-backend - Target: IP address or FQD (Paste Private IP from Backend of ACI)
+1- pool-frontend - Target: App Service (Select a App Service of Frontend)
 
-2- pool-backend - Target: IP address or FQD (Paste Private IP from Frontend of ACI)
+2- pool-backend - Target: App Service (Select a App Service of Backend)
 
 ---------------------------------------------------------------
 
