@@ -201,7 +201,11 @@ Enterprise-Web-Platform/
 │   └── package.json
 ├── docs/                          # Documentation
 │   └── diagrams/
-│       └── enterprise-web-app - 1.webp
+│   |   └── enterprise-web-app - 1.png
+│   |   └── enterprise-web-app - 1.png
+|   └── structure
+|       └── Backend Project Structure.txt
+|       └── Frontend Project Structure.txt
 ├── .gitignore
 ├── LICENSE
 └── README.md
@@ -221,7 +225,7 @@ Enterprise-Web-Platform/
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/yourusername/Enterprise-Web-Platform.git
+git clone https://github.com/abdulazizheresh/Enterprise-Web-Platform.git
 cd Enterprise-Web-Platform
 ```
 
@@ -240,26 +244,7 @@ This includes:
 - Application Gateway configuration
 - Key Vault secret management
 
-3. **Build and Push Docker Images**
-
-```bash
-# Login to ACR
-docker login yourregistry.azurecr.io
-
-# Build and push backend
-cd backend
-docker build -t enterprise-backend:1 .
-docker tag enterprise-backend:1 yourregistry.azurecr.io/enterprise-backend:1
-docker push yourregistry.azurecr.io/enterprise-backend:1
-
-# Build and push frontend
-cd ../enterprise_app
-docker build --build-arg VITE_API_URL="/api" --build-arg VITE_SOCKET_URL="/" -t enterprise-frontend:1 .
-docker tag enterprise-frontend:1 yourregistry.azurecr.io/enterprise-frontend:1
-docker push yourregistry.azurecr.io/enterprise-frontend:1
-```
-
-4. **Deploy to Azure**
+3. **Deploy to Azure**
 
 App Services will automatically pull and deploy the latest images from ACR.
 
