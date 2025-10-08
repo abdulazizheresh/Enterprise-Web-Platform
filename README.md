@@ -11,7 +11,7 @@
 [![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
-[Live Demo](#) • [Documentation](./docs) • [Architecture](#architecture) • [Contact](#contact)
+[Documentation](./docs) • [VueJs Structure](./docs/structure/Fronend%20Project%20Structure.txt) • [NodeJs Structure](./docs/structure/Backend%20Project%20Structure.txt)
 
 </div>
 
